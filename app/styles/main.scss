@@ -1,0 +1,23 @@
+// bower:scss
+@import "bower_components/bootstrap/scss/bootstrap.scss";
+// endbower
+@import "variable.scss";
+@import "base.scss";
+
+// Homepage
+.header.home {
+  padding-top: 165px;
+  text-align: center;
+  .logo {
+    width: 373px;
+  }
+  h2 {
+    margin-top: 30px;
+    font-size: 1.25em;
+    color: #404040;
+  }
+  .btn-header {
+    display: block;
+    margin-top: 40px;
+  }
+}

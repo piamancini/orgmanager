@@ -1,0 +1,17 @@
+* {
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+.btn {
+  border: none;
+}
+
+.btn-primary {
+  padding: 13px 20px!important;
+  border-radius: 200px!important;
+  background: $primary;
+
+  &:hover {
+    background: darken($primary, 5%);
+  }
+}
