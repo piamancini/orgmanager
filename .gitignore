@@ -10,3 +10,6 @@ Homestead.yaml
 .env.*
 !.env.example
 composer.lock
+/bower_components
+.tmp
+.DS_Store
