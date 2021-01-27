@@ -5,11 +5,11 @@ namespace Tests\Feature;
 use App\Org;
 use App\User;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class DataTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     /**
      * Test dashboard gets orgs.
@@ -19,14 +19,14 @@ class DataTest extends TestCase
     public function testDashboard()
     {
         $user = factory(User::class)->create();
-        $orgs = factory(Org::class, 5)->create([
+        factory(Org::class, 5)->create([
           'userid' => $user->id,
         ]);
         $response = $this->actingAs($user)
                          ->get('dashboard');
 
         $response->assertStatus(200)
-                 ->assertViewHas('orgs', Org::where('userid', '=', $user->id)->paginate(15));
+                 ->assertViewHas('orgs', Org::where('userid', '=', $user->id)->get());
     }
 
     /**

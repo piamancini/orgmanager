@@ -10,6 +10,7 @@ return [
     | This value is the name of your application. This value is used when the
     | framework needs to place the application's name in a notification or
     | any other location as required by the application or its packages.
+    |
     */
 
     'name' => 'OrgManager',
@@ -33,7 +34,7 @@ return [
     |
     | This value determines the "environment" your application is currently
     | running in. This may determine how you prefer to configure various
-    | services your application utilizes. Set this in your ".env" file.
+    | services the application utilizes. Set this in your ".env" file.
     |
     */
 
@@ -64,6 +65,7 @@ return [
     */
 
     'url' => env('APP_URL', 'http://localhost'),
+    'asset_url' => env('ASSET_URL', null),
 
     /*
     |--------------------------------------------------------------------------
@@ -103,6 +105,18 @@ return [
     */
 
     'fallback_locale' => 'en',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Faker Locale
+    |--------------------------------------------------------------------------
+    |
+    | This locale will be used by the Faker PHP library when generating fake
+    | data for your database seeds. For example, this will be used to get
+    | localized telephone numbers, street address information and more.
+    |
+    */
+    'faker_locale' => 'en_US',
 
     /*
     |--------------------------------------------------------------------------
@@ -179,13 +193,7 @@ return [
         /*
          * Package Service Providers...
          */
-
-        AdamWathan\EloquentOAuthL5\EloquentOAuthServiceProvider::class,
-        GrahamCampbell\GitHub\GitHubServiceProvider::class,
-        Bugsnag\BugsnagLaravel\BugsnagServiceProvider::class,
-        M1guelpf\DeployingMode\DeployingModeServiceProvider::class,
         OrgManager\Logos\OrgManagerLogosServiceProvider::class,
-        GrahamCampbell\Core\CoreServiceProvider::class,
         // OrgManager\OrgmanagerCustom\OrgmanagerCustomServiceProvider::class,
 
         /*
@@ -245,10 +253,8 @@ return [
         'URL'          => Illuminate\Support\Facades\URL::class,
         'Validator'    => Illuminate\Support\Facades\Validator::class,
         'View'         => Illuminate\Support\Facades\View::class,
-        'SocialAuth'   => AdamWathan\EloquentOAuth\Facades\OAuth::class,
         'Github'       => GrahamCampbell\GitHub\Facades\GitHub::class,
         'Input'        => Illuminate\Support\Facades\Input::class,
-        'Bugsnag'      => Bugsnag\BugsnagLaravel\Facades\Bugsnag::class,
     ],
 
 ];

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Org;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Requests\OrgPasswordRequest;
 use App\Http\Requests\CustomMessageRequest;
@@ -21,13 +23,26 @@ class OrgController extends Controller
         return view('settings', compact('org'));
     }
 
-    public function changePassword(OrgPasswordRequest $request, Org $org)
+    public function password(Org $org)
     {
         $this->authorize('update', $org);
-        $org->password = bcrypt($request->input('org_passwd'));
-        $org->save();
 
-        return redirect('org/'.$org->id)->withSuccess('The organization password was successfully updated.');
+        request()->validate([
+            'password' => 'required|string'
+        ]);
+
+        return tap($org, function($org) {
+            $org->update(['password' => Hash::make(request('password'))]);
+        });
+    }
+
+    public function removePassword(Org $org)
+    {
+        $this->authorize('update', $org);
+
+        return tap($org, function($org) {
+            $org->update(['password' => null]);
+        });
     }
 
     public function update(Org $org)

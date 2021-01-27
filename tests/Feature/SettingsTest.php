@@ -5,11 +5,11 @@ namespace Tests\Feature;
 use App\Org;
 use App\User;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class SettingsTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     /**
      * Test settings page is loaded.
@@ -42,9 +42,10 @@ class SettingsTest extends TestCase
         ]);
         $response = $this->actingAs($user)
                          ->post('org/'.$org->id, ['org_passwd' => 'password']);
+        $org->refresh();
         $response->assertRedirect('org/'.$org->id)
                  ->assertSessionHas('success', 'The organization password was successfully updated.');
-        $this->assertTrue(password_verify('password', $org->fresh()->password));
+        $this->assertTrue(password_verify('password', $org->password));
     }
 
     /**
@@ -78,14 +79,14 @@ class SettingsTest extends TestCase
         ]);
         $response = $this->actingAs($user)
                          ->post('org/'.$org->id.'/message', ['message' => '# Markdown test']);
+        $org->refresh();
         $response->assertRedirect('org/'.$org->id)
                  ->assertSessionHas('success', 'The message was successfully updated.');
-        $this->assertEquals('# Markdown test', $org->fresh()->custom_message);
+        $this->assertEquals('# Markdown test', $org->custom_message);
         $response = $this->actingAs($user)
                          ->post('org/'.$org->id.'/message', ['message' => 'Some text, \'<script>alert()</script>']);
         $response->assertRedirect('org/'.$org->id)
                  ->assertSessionHas('success', 'The message was successfully updated.');
-        $this->assertEquals('Some text, "', $org->fresh()->custom_message);
-        $this->assertNotEquals('Some text, \'<script>alert()</script>', $org->fresh()->custom_message);
+        $this->assertNotEquals('Some text, \'<script>alert()</script>', $org->custom_message);
     }
 }

@@ -10,26 +10,27 @@ class Org extends Model
 
     public $incrementing = false;
 
-    protected $fillable = [
-      'id', 'name', 'url', 'description', 'avatar', 'custom_message',
-    ];
-
     protected $hidden = [
         'password', 'role', 'userid',
     ];
 
     public function user()
     {
-        return $this->belongsTo('App\User', 'userid', 'id');
+        return $this->belongsTo(User::class, 'userid', 'id');
     }
 
     public function teams()
     {
-        return $this->hasMany('App\Team');
+        return $this->hasMany(Team::class);
     }
 
     public function team()
     {
-        return $this->belongsTo('App\Team');
+        return $this->belongsTo(Team::class);
+    }
+
+    public function hasPassword()
+    {
+        return ! is_null($this->password);
     }
 }

@@ -13,12 +13,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        \App\Console\Commands\AddToken::class,
-        \App\Console\Commands\UpdateOrg::class,
-        \App\Console\Commands\JoinOrg::class,
-        \App\Console\Commands\EncryptOrgPasswords::class,
-        \App\Console\Commands\RemindUsers::class,
-        \Bugsnag\BugsnagLaravel\Commands\DeployCommand::class,
+        //
     ];
 
     /**
@@ -36,12 +31,14 @@ class Kernel extends ConsoleKernel
     }
 
     /**
-     * Register the Closure based commands for the application.
+     * Register the commands for the application.
      *
      * @return void
      */
     protected function commands()
     {
+        $this->load(__DIR__.'/Commands');
+
         require base_path('routes/console.php');
     }
 }

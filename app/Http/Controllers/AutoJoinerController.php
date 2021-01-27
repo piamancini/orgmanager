@@ -30,11 +30,14 @@ class AutoJoinerController extends Controller
     protected function requestSignatureIsValid() : bool
     {
         $gitHubSignature = request()->header('X-Hub-Signature');
-        list($usedAlgorithm, $gitHubHash) = explode('=', $gitHubSignature, 2);
+        [$usedAlgorithm, $gitHubHash] = explode('=', $gitHubSignature, 2);
+        if ($usedAlgorithm !== config('auth.github_hmac', 'sha1')) {
+            return 'Wrong HMAC algorithm';
+        }
         $payload = file_get_contents('php://input');
         $calculatedHash = hash_hmac($usedAlgorithm, $payload, config('auth.github_secret'));
 
-        return $calculatedHash === $gitHubHash;
+        return hash_equals($calculatedHash, $gitHubHash);
     }
 
     protected function getOrgId(Request $request) : int

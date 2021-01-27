@@ -1,4 +1,5 @@
-const { mix } = require('laravel-mix');
+const mix = require("laravel-mix");
+const tailwindcss = require("tailwindcss");
 
 /*
  |--------------------------------------------------------------------------
@@ -11,9 +12,19 @@ const { mix } = require('laravel-mix');
  |
  */
 
-mix.js('resources/assets/js/app.js', 'public/js')
-   .sass('resources/assets/sass/app.scss', 'public/css')
-   .styles([
-	'public/css/app.css',
-	'resources/assets/css/flatly.css',
-   ], 'public/css/app.css');
+mix
+  .js("resources/js/app.js", "public/js")
+  .less("resources/less/new.less", "public/css")
+  .options({
+    postCss: [tailwindcss("./tailwind.js")]
+  })
+  .webpackConfig({
+    output: {
+      publicPath: '/',
+      chunkFilename: 'js/chunks/[name].js?[chunkhash]',
+    }
+  });
+
+if (mix.inProduction()) {
+  mix.version();
+}

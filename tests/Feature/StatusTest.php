@@ -5,11 +5,11 @@ namespace Tests\Feature;
 use App\Org;
 use App\User;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class StatusTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     /**
      * Test the home page returns a 200 status code (OK).
@@ -33,7 +33,7 @@ class StatusTest extends TestCase
         $response = $this->get('login');
         parse_str(parse_url($response->headers->get('location'))['query'], $query);
 
-        $response->assertRedirect('https://github.com/login/oauth/authorize?client_id='.config('eloquent-oauth.providers.github.client_id').'&scope=user%3Aemail%2Cadmin%3Aorg&redirect_uri='.config('eloquent-oauth.providers.github.redirect_uri').'&response_type=code&state='.$query['state']);
+        $response->assertRedirect('https://github.com/login/oauth/authorize?scope=user%3Aemail%2Cadmin%3Aorg&response_type=code&state='.$query['state']);
     }
 
     /**
@@ -100,49 +100,49 @@ class StatusTest extends TestCase
         $response->assertStatus(200);
     }
 
-     /**
-      * Test the token page returns a 200 status code (OK).
-      *
-      * @return void
-      */
-     public function testTokenPage()
-     {
-         $user = factory(User::class)->create();
-         $response = $this->actingAs($user)
+    /**
+     * Test the token page returns a 200 status code (OK).
+     *
+     * @return void
+     */
+    public function testTokenPage()
+    {
+        $user = factory(User::class)->create();
+        $response = $this->actingAs($user)
                           ->get('token');
 
-         $response->assertStatus(200);
-     }
+        $response->assertStatus(200);
+    }
 
-     /**
-      * Test the organization settings page returns a 200 status code (OK).
-      *
-      * @return void
-      */
-     public function testOrgPage()
-     {
-         $user = factory(User::class)->create();
-         $org = factory(Org::class)->create([
+    /**
+     * Test the organization settings page returns a 200 status code (OK).
+     *
+     * @return void
+     */
+    public function testOrgPage()
+    {
+        $user = factory(User::class)->create();
+        $org = factory(Org::class)->create([
            'userid' => $user->id,
          ]);
-         $response = $this->actingAs($user)
+        $response = $this->actingAs($user)
                           ->get('org/'.$org->id);
-         $response->assertStatus(200);
-     }
+        $response->assertStatus(200);
+    }
 
-     /**
-      * Test the teams page returns a 200 status code (OK).
-      *
-      * @return void
-      */
-     public function testTeamsPage()
-     {
-         $user = factory(User::class)->create();
-         $org = factory(Org::class)->create([
+    /**
+     * Test the teams page returns a 200 status code (OK).
+     *
+     * @return void
+     */
+    public function testTeamsPage()
+    {
+        $user = factory(User::class)->create();
+        $org = factory(Org::class)->create([
            'userid' => $user->id,
          ]);
-         $response = $this->actingAs($user)
+        $response = $this->actingAs($user)
                           ->get('org/'.$org->id.'/teams');
-         $response->assertStatus(200);
-     }
+        $response->assertStatus(200);
+    }
 }

@@ -1,84 +1,82 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+<!doctype html>
+<html lang="{{ app()->getLocale() }}">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>@lang('join.join') {{ $org->name }}</title>
+    <title>Join {{ $org->pretty_name ?? $org->name }}</title>
 
-        <!-- Fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
-        <!-- Styles -->
-    <link href="{{ url('/css/join.css') }}" rel="stylesheet">
-    <link href="{{ url('/css/app.css') }}" rel="stylesheet">
-    <link href="{{ url('/css/sweetalert.css') }}" rel="stylesheet">
-    @include('layouts.code.head')
+    <link href="{{ mix('css/new.css') }}" rel="stylesheet">
+
+    <script src='https://www.google.com/recaptcha/api.js' async defer></script>
     <script>
-    function submitForm(token) {
-           document.getElementById("join-form").submit();
-    }
+       function onSubmit(token) {
+         document.getElementById("join-form").submit();
+       }
+    </script>
 
-  function validate(event) {
-    event.preventDefault();
-    if (!document.getElementById('github_username').value) {
-      sweetAlert("Oops...", "You need to specify an username.", "error");
-    } else {
-      grecaptcha.execute();
-    }
-  }
+    @include('layouts.code.head')
+</head>
 
-  function onload() {
-    var element = document.getElementById('btnSubmit');
-    element.onclick = validate;
-  }
-</script>
-    </head>
-    <body>
-        <div class="flex-center position-ref full-height">
+<body class="bg-grey-lightest bg-pattern border-t-2 border-teal overflow-hidden">
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="max-w-sm rounded overflow-hidden shadow-lg bg-white transition">
+            <div class="px-6 py-4 text-center">
+                <div class="text-center">
+                    <img src="{{ $org->avatar }}" class="w-24 h-24 rounded-full mb-4">
+                </div>
 
-            <div class="content">
-                <div class="title m-b-md">
-                  <img src="{{ $org->avatar }}" class="logo"><br>
-                    @lang('join.join') <a href="https://github.com/{{ $org->name }}" target="_blank">{{ $org->pretty_name or $org->name }}</a>
-                    @if (isset($org->team))
-                    @if($org->team->privacy == 'closed')
-                    <h6>You'll also join the <a href="{{ url('https://github.com/orgs/'.$org->name.'/teams/'.str_slug($org->team->name)) }}" target="_blank">{{ $org->team->name }}</a> team</h6>
+                <h1 class="font-bold text-2xl mb-2 text-center text-grey-darkest">Join <a class="no-underline text-inherit link-shadow link-transition" href="https://github.com/{{ $org->name }}" target="_blank" rel="noopener noreferrer">{{ $org->pretty_name ?? $org->name }}</a></h1>
+
+
+                @if (optional($org->team)->exists)
+                    @if ($org->team->privacy == 'closed')
+                        <h1 class="text-sm mb-4 text-center text-grey-darker font-medium">You will also join the <a href="https://github.com/orgs/{{ $org->name }}/teams/{{ str_slug($org->team->name) }}" target="_blank" rel="noopener noreferrer" class="no-underline text-inherit link-shadow link-transition">{{ $org->team->name }}</a> team</h1>
                     @else
-                    <h6>You'll also join the private "{{ $org->team->name }}" team</h6>
+                        <h1 class="text-sm mb-4 text-center text-grey-darker font-medium">You will also join the private {{ $org->team->name }} team</h1>
                     @endif
-                    @endif
-                    @if ($org->description)
-                    <blockquote>{{ $org->description }}</blockquote>
-                    @endif
-                </div>
-                <div class="join">
-                  @lang('join.username') @if ($org->password != null && trim($org->password) != "")@lang('join.passwd') @endif @lang('join.tojoin') {{ $org->name }}:<br><br>
-                    <form id="join-form" method="POST" href="{{ url('join/'.$org->id) }}">
-                      {{ csrf_field() }}
-                      <input id="github_username" type="text" name="github_username" class="textbox {{ $errors->has('github_username') ? 'has-error' : '' }}" placeholder="@lang('join.uplace')" value="{{ old('github_username') }}"><br><br>
-                      @if ($org->password != null && trim($org->password) != "")
-                      <input type="password" name="org_password" class="textbox" placeholder="@lang('join.pplace')"><br><br>
-                      @endif
-                      <div id='recaptcha' class="g-recaptcha" data-sitekey="{{ env('RECAPTCHA_PUBLIC_KEY') }}" data-callback="submitForm" data-size="invisible"></div>
-                      <button class="submit-button" id="btnSubmit" name="btnSubmit">@lang('join.join')!</button>
-                    </form>
-                </div>
+                @endif
+
+                @if ($org->description)
+                    <p class="text-grey-darker text-base">{{ $org->description ?? '' }}</p>
+                @endif
             </div>
+            <div class="border-b mb-4"></div>
+            <form id="join-form" method="POST" href="{{ route('join.post', $org) }}">
+                {{ csrf_field() }}
+                @if ($org->hasPassword())
+                    <div class="px-6 pb-4">
+                        <p class="text-grey-darker text-base mb-2">Enter the organization password to join {{ $org->pretty_name ?? $org->name }}:</p>
+                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker" name="org_password" type="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;">
+                    </div>
+                @endif
+                <div class="text-center mb-4">
+                    <button type="submit" data-sitekey="{{ config('recaptcha.key') }}" class="bg-grey-darkest hover:bg-black-github text-white font-bold py-2 px-4 rounded g-recaptcha" data-callback="onSubmit">
+                        <div class="flex items-center items-stretch justify-between">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M12 .3C5.4.3 0 5.7 0 12.3c0 5.3 3.4 9.8 8.2 11.4.6 0 .8-.3.8-.6v-2c-3.3.8-4-1.5-4-1.5-.6-1.4-1.4-1.8-1.4-1.8-1-.7 0-.7 0-.7 1.3 0 2 1.2 2 1.2 1 1.8 2.8 1.3 3.5 1 .2-.8.5-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.2.5-2.3 1.3-3-.2-.5-.6-1.7 0-3.3 0 0 1-.3 3.4 1.2 1-.3 2-.4 3-.4s2 .2 3 .5c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8 0 3.2 1 .8 1.3 2 1.3 3.2 0 4.6-2.8 5.6-5.5 6 .6.3 1 1 1 2v3.4c0 .4 0 .8.8.7 4.8-1.6 8.2-6 8.2-11.4 0-6.6-5.4-12-12-12"></path></svg>
+                            <span class="inline-flex items-center">Join with GitHub</span>
+                        </div>
+                    </button>
+                </div>
+            </form>
+            <div id="codefund_ad"></div>
         </div>
-        <script src="{{ url('js/app.js') }}"></script>
-        <script src='https://www.google.com/recaptcha/api.js' async defer></script>
-        <script>onload();</script>
-        @if (count($errors) > 0)
+    </div>
+    <script src="{{ mix('js/landing.js') }}"></script>
+    <script src="https://codefund.io/scripts/e9d802da-6c58-4907-b8a2-079a78adfc64/embed.js"></script>
+    @if (count($errors) > 0)
         <script>
-        sweetAlert("Oops...", "{{ $errors->first() }}", "error");
+            swal("Oops...", "{{ $errors->first() }}", "error");
         </script>
-        @endif
-        @if (session('success'))
+    @endif
+    @if (session('success'))
         <script>
-        swal({title: "Good job!", text: '{{ session('success') }}', type: "success", html:true})
+            swal({title: "Good job!", html: '{!! session('success') !!}', type: "success"})
         </script>
-        @endif
-        @include('layouts.code.footer')
-    </body>
+    @endif
+
+    @include('layouts.code.footer')
+</body>
+
 </html>
